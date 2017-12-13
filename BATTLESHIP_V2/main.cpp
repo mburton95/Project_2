@@ -9,6 +9,7 @@
 #include <iostream>
 #include <cstdlib> //random generator
 #include <time.h> // for random
+#include <fstream> // for file
 using namespace std;
 
  
@@ -43,6 +44,8 @@ void fire(char[][10],char[][10],int,int);
 void ai(char[][10]);
 void play(char[][10],char[][10],char[][10]);
 int hit(char&,char);
+int score(int);
+void fcnt(string);
 
 //Program Execution Begins Here
 int main(int argc, char** argv) {
@@ -66,6 +69,8 @@ int main(int argc, char** argv) {
     plceshp(grid,'S',3,7,1);
     plceshp(grid,'D',2,8,1);
     plceshp(grid,'c',3,7,1);
+    cout<<"First, we will show you the AI board for diagnostic purposes"<<endl;
+    dsplygd(grid);
     
     play(grid,board,plays);
     
@@ -160,7 +165,7 @@ int check(char grid[][10],int r, int c, int disp)
         // checks all the vertical sides
         for(int i=c;i<10;i++)
         {
-            check=grid[c][i]; 
+            check=grid[c][r]; 
                     if(check!='_')
                         return 1;
         }
@@ -172,7 +177,7 @@ int check(char grid[][10],int r, int c, int disp)
         // checks all the horizontal sides
         for(int i=r;i<10;i++)
         {
-            check=grid[i][r];
+            check=grid[c][r];
             if(check!='_')
                 return 1;
         }
@@ -199,53 +204,52 @@ int hit(char grid[][10],char name) // checking for a hit.
     
     
 // Checks for a win. if 17 positions are hit that occupy ships, the user wins
-int win(int A)
+int win(int A=0)
 {
     static int W=A;
     W++;
     return W;
 }   
 // the following 6 programs count how many times the enemy ship type was hit
-int Dcount(int A)
+int Dcount(int A=0)
 {
     
     static int D = 0;
     D++;
-    cout<<D<<endl;
     return D;
 }
-int Scount(int sub)
+int Scount(int sub=0)
 {
     static int S = sub;
     S++;
     return S;
 }
-int ccount(int cruise)
+int ccount(int cruise=0)
 {
     static int c = cruise;
     c++;
     return c;
 }
-int Bcount(int Btl)
+int Bcount(int Btl=0)
 {
     static int B=Btl;
     B++;
     return B;
 }
-int CCount(int Car)
+int CCount(int Car=0)
 {
     static int C = Car;
     C++;
     return C;
 }
-int awin(int A)
+int awin(int A=0)
 {
     static int W=A;
     W++;
     return W;
 }   
 // The same as above, except for the AI
-int aid(int A)
+int aid(int A=0)
 {
     
     static int D = 0;
@@ -253,25 +257,25 @@ int aid(int A)
     cout<<D<<endl;
     return D;
 }
-int ais(int sub)
+int ais(int sub=0)
 {
     static int S = sub;
     S++;
     return S;
 }
-int aic(int cruise)
+int aic(int cruise=0)
 {
     static int c = cruise;
     c++;
     return c;
 }
-int aib(int Btl)
+int aib(int Btl=0)
 {
     static int B=Btl;
     B++;
     return B;
 }
-int aiC(int Car)
+int aiC(int Car=0)
 {
     static int C = Car;
     C++;
@@ -287,7 +291,7 @@ void fire(char grid[][10],char board[][10],int col, int row)
     char name=grid[col][row];
     if(name!='_'&&name!='H'&&name!='M')
     {
-        vict=win(first); // if a ship is hit, points get added to the users win
+        vict=win(); // if a ship is hit, points get added to the users win
     cout<<"Game counter in fire function "<<vict<<endl;
     }
     
@@ -303,13 +307,13 @@ void fire(char grid[][10],char board[][10],int col, int row)
             // again, grid is for diagnostics
             
            
-            D=Dcount(first);
+            D=Dcount();
             cout<<D<<endl;
             
             if(D==2)
             {
                 cout<<"Destroyer sunk!"<<endl;
-                 if(vict==17)
+                 if(vict>=17)// if you hit the enemy 17 times, you
     {
          
         victory(); // display victory message if all ships are killed
@@ -325,10 +329,10 @@ void fire(char grid[][10],char board[][10],int col, int row)
         {
             grid[col][row]='H';
             board[col][row]='H';
-            c=ccount(first);
+            c=ccount();
             if(c==3){
                 cout<<"Cruiser sunk!!"<<endl;
-                 if(vict==17)
+                 if(vict>=17)
     {
          
         victory();
@@ -342,11 +346,11 @@ void fire(char grid[][10],char board[][10],int col, int row)
         {
             grid[col][row]='H';
             board[col][row]='H';
-            S=Scount(first);
+            S=Scount();
             if(S==3)
             {
                 cout<<"Submarine sunk!"<<endl;
-              if(vict==17)
+             if(vict>=17)
     {
 
         victory();
@@ -360,11 +364,11 @@ void fire(char grid[][10],char board[][10],int col, int row)
         {
             grid[col][row]='H';
             board[col][row]='H';
-            B=Bcount(first);
+            B=Bcount();
             if(B==4)
             {
-                cout<<"You sunk my battleship!"<<endl;
-              if(vict==17)
+                cout<<"You sunk the enemy's battleship!"<<endl;
+              if(vict>=17)
     {
          
       
@@ -378,12 +382,12 @@ void fire(char grid[][10],char board[][10],int col, int row)
             {
                 grid[col][row]='H';
                 board[col][row]='H';
-                C=CCount(first);
+                C=CCount();
                 
                 if(C==5)
                 {
                     cout<<"Carrier sunk!"<<endl;
-                     if(vict==17)
+                     if(vict>=17)
     {
          
      
@@ -416,6 +420,8 @@ void fire(char grid[][10],char board[][10],int col, int row)
 void play(char grid[][10],char board[][10],char play[][10])
 {
     int col,row;
+    int Scre;
+    int chk=0;
     bool game=true;
     // the user places their ships
     cout<<"First, place down your positions onto the board!"<<endl;
@@ -425,12 +431,14 @@ void play(char grid[][10],char board[][10],char play[][10])
     {
       // This loop goes through the game until a victor is chosen.
         // the game value doesn't change on purpose
-     dsplygd(grid);
-     dsplygd(board);
+     
+     dsplygd(board); //Plain board0
+     
         cout<<"Where would you like to fire! Enter the Column, then the row"<<endl;
     cin>>col;
     cin>>row;
      fire(grid,board,col,row);
+     Scre=score(chk);//counting up the score
      cout<<"Now the AI shall take their shot!"<<endl;
      dsplygd(play);
      ai(play);
@@ -445,6 +453,10 @@ void victory()
 {
     // and here is your generic victory message
     cout<<"You have vanquished your enemies! Congratulations!"<<endl;
+    cout<<"Please enter your name, oh victorious one!"<<endl;
+    string name;
+    cin>>name;
+    fcnt(name);
     exit(EXIT_SUCCESS);
 }
 void loss()
@@ -459,17 +471,27 @@ void player(char player[][10])
     cout<<"Now you shall create your board!"<<endl;
     int choice,col,row;
     int counter=0;
-    
+    bool acct=false;
     // Loop goes through every ship(There's five);
     while(counter<5)
     {
         for(int i =0;i<2;i++) // several for loops go through the ship sizes and place the markers down, changing the grid for the AI.
         {
+            
+                
             dsplygd(player);
             cout<<"Please enter position "<<i+1<<" for your DESTROYER"<<endl;
-            cout<<"Column, then row, and then again"<<endl;
             cin>>col;
             cin>>row;
+            
+            while(col <0||col>9 || row<0 || row>9 || player[col][row]!='_')
+            {
+                
+                cout<<"Incorrect placement! Try again."<<endl;
+                cout<<"Please enter position "<<i+1<<" for your DESTROYER"<<endl;
+                cin>>col;
+                cin>>row;
+            }
             player[col][row]='D';
             
                     
@@ -482,6 +504,14 @@ void player(char player[][10])
             cout<<"Please enter position "<<i+1<<" for your SUB. same as before!"<<endl;
             cin>>col;
             cin>>row;
+            while(col <0||col>=10 || row<0 || row>=10 || player[col][row]!='_')
+            {
+                
+                cout<<"Incorrect placement! Try again."<<endl;
+                cout<<"Please enter position "<<i+1<<" for your SUB. same as before!"<<endl;
+                cin>>col;
+                cin>>row;
+            }
             player[col][row]='S';
             dsplygd(player);
             
@@ -489,9 +519,17 @@ void player(char player[][10])
         counter++;
         for(int i=0;i<3;i++)
         {
-            cout<<"Please enter position"<<i+1<<" for your cruiser"<<endl;
+            cout<<"Please enter position "<<i+1<<" for your cruiser"<<endl;
             cin>>col;
             cin>>row;
+            while(col <0||col>=10 || row<0 || row>=10 || player[col][row]!='_')
+            {
+                
+                cout<<"Incorrect placement! Try again."<<endl;
+                cout<<"Please enter position"<<i+1<<" for your cruiser"<<endl;
+                cin>>col;
+                cin>>row;
+            }
             player[col][row]='c';
             dsplygd(player);
             
@@ -503,6 +541,14 @@ void player(char player[][10])
             cout<<"Please enter position "<<i+1<<" for your BATTLESHIP!"<<endl;
             cin>>col;
             cin>>row;
+            while(col <0||col>=10 || row<0 || row>=10 || player[col][row]!='_')
+            {
+                
+                cout<<"Incorrect placement! Try again."<<endl;
+                cout<<"Please enter position "<<i+1<<" for your BATTLESHIP!"<<endl;
+                cin>>col;
+                cin>>row;
+            }
             player[col][row]='B';
             dsplygd(player);
         }
@@ -512,6 +558,14 @@ void player(char player[][10])
             cout<<"Please enter position "<<i+1<<" for your CARRIER!"<<endl;
             cin>>col;
             cin>>row;
+            while(col <0||col>=10 || row<0 || row>=10 || player[col][row]!='_')
+            {
+                
+                cout<<"Incorrect placement! Try again."<<endl;
+                 cout<<"Please enter position "<<i+1<<" for your CARRIER!"<<endl;
+                cin>>col;
+                cin>>row;
+            }
             player[col][row]='C';
             dsplygd(player);
         }
@@ -553,13 +607,13 @@ void ai(char player[][10]) // this function is the AI attacking the players ship
             player[col][row]='H';
             
            
-            D=aid(first);
+            D=aid();
             cout<<D<<endl;
             
             if(D==2)
             {
                 cout<<"Our Destroyer was sunk!"<<endl;
-                 if(vict==17)
+                 if(vict>=17)
     {
          
         loss();
@@ -575,10 +629,10 @@ void ai(char player[][10]) // this function is the AI attacking the players ship
         {
             
            player[col][row]='H';
-            c=aic(first);
+            c=aic();
             if(c==3){
                 cout<<" Our Cruiser sunk!!"<<endl;
-                 if(vict==17)
+                 if(vict>=17)
     {
          
         loss();
@@ -592,11 +646,11 @@ void ai(char player[][10]) // this function is the AI attacking the players ship
         {
             
             player[col][row]='H';
-            S=ais(first);
+            S=ais();
             if(S==3)
             {
                 cout<<"Our Submarine sunk!"<<endl;
-              if(vict==17)
+               if(vict>=17)
     {
 
         loss();
@@ -610,11 +664,11 @@ void ai(char player[][10]) // this function is the AI attacking the players ship
         {
             
             player[col][row]='H';
-            B=aib(first);
+            B=aib();
             if(B==4)
             {
                 cout<<"They sunk our battleship!"<<endl;
-              if(vict==17)
+              if(vict>=17)
     {
          
       
@@ -633,7 +687,7 @@ void ai(char player[][10]) // this function is the AI attacking the players ship
                 if(C==5)
                 {
                     cout<<"Carrier sunk!"<<endl;
-                     if(vict==17)
+                     if(vict>=17)
     {
          
      
@@ -661,6 +715,49 @@ void ai(char player[][10]) // this function is the AI attacking the players ship
 
     
     }
+}
+
+int score(int C=0)
+{
+    static int S=C;
+    S++;
+    return S;
+}
+void fcnt(string name)
+{
+    int scre = score();
+    int high;//int for high score
+    int a; // pulled from txt
+    cout<<endl;
+    cout<<name<<"'s SCORE: "<<scre<<endl;
+    ofstream o;// prints onto file
+    ifstream s;// pulls in file
+    s.open("Winners.txt");
+    if(!s)
+    {
+        cout<<"unable to open file"<<endl;
+        exit(1);
+    
+    }
+    while(s>>a)
+    {
+        if(a>scre)
+        {
+            high=a;
+        }
+        else if (scre>a)
+        {
+            scre=high;
+        }
+        else
+        {
+            a=high;
+        }
+    }// the last number in the file is pullsed
+    o.open("Winners.txt",std::ofstream::out|std::ofstream::app);
+    
+    o<<name<<"'s SCORE: "<<scre<<endl;
+    o.close();
 }
 
 /**
