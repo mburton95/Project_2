@@ -15,9 +15,7 @@ using namespace std;
  
 //User Libraries Here
 
-//Global Constants Only, No Global Variables
- // COL, ROW
-//Like PI, e, Gravity, or conversions
+
 
 //Function Prototypes Here
 void mkegrid(char[][10]);
@@ -45,7 +43,7 @@ void ai(char[][10]);
 void play(char[][10],char[][10],char[][10]);
 int hit(char&,char);
 int score(int);
-void fcnt(string);
+void fcnt();
 
 //Program Execution Begins Here
 int main(int argc, char** argv) {
@@ -292,7 +290,7 @@ void fire(char grid[][10],char board[][10],int col, int row)
     if(name!='_'&&name!='H'&&name!='M')
     {
         vict=win(); // if a ship is hit, points get added to the users win
-    cout<<"Game counter in fire function "<<vict<<endl;
+    //cout<<"Game counter in fire function "<<vict<<endl;
     }
     
    
@@ -439,8 +437,9 @@ void play(char grid[][10],char board[][10],char play[][10])
     cin>>row;
      fire(grid,board,col,row);
      Scre=score(chk);//counting up the score
-     cout<<"Now the AI shall take their shot!"<<endl;
+     
      dsplygd(play);
+     cout<<"Now the AI shall take their shot!"<<endl;
      ai(play);
      
      
@@ -453,10 +452,8 @@ void victory()
 {
     // and here is your generic victory message
     cout<<"You have vanquished your enemies! Congratulations!"<<endl;
-    cout<<"Please enter your name, oh victorious one!"<<endl;
-    string name;
-    cin>>name;
-    fcnt(name);
+    
+    fcnt();
     exit(EXIT_SUCCESS);
 }
 void loss()
@@ -595,7 +592,7 @@ void ai(char player[][10]) // this function is the AI attacking the players ship
    if(name!='_'&&name!='H'&&name!='M')
     {
         vict=awin(first); // every time a hit lands, the counter goes up. Max being 18.
-    cout<<"Game counter in fire function "<<vict<<endl;
+  //  cout<<"Game counter in fire function "<<vict<<endl;
     }
     switch(name)
     {
@@ -723,37 +720,18 @@ int score(int C=0)
     S++;
     return S;
 }
-void fcnt(string name)
+void fcnt()
 {
     int scre = score();
-    int high;//int for high score
     int a; // pulled from txt
     cout<<endl;
-    cout<<name<<"'s SCORE: "<<scre<<endl;
     ofstream o;// prints onto file
-    ifstream s;// pulls in file
-    s.open("Winners.txt");
-    if(!s)
-    {
-        cout<<"unable to open file"<<endl;
-        exit(1);
     
-    }
-    while(s>>a)
-    {
-        if(a>scre)
-        {
-            high=a;
-        }
-        else if (scre>a)
-        {
-            scre=high;
-        }
-        else
-        {
-            a=high;
-        }
-    }// the last number in the file is pullsed
+    
+   cout<<"Please enter your name, oh victorious one!"<<endl;
+    string name;
+    cin>>name;
+    cout<<name<<"'s SCORE: "<<scre<<endl;
     o.open("Winners.txt",std::ofstream::out|std::ofstream::app);
     
     o<<name<<"'s SCORE: "<<scre<<endl;
