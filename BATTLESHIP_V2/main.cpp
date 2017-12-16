@@ -1,7 +1,7 @@
 /* 
  * File:   main.cpp
  * Author: Marcus Burton
- * Created on December 11th 10:32PM
+ * Created on December 11th SIZE:32PM
  * Purpose:  Battleship!
  */
 
@@ -10,23 +10,24 @@
 #include <cstdlib> //random generator
 #include <time.h> // for random
 #include <fstream> // for file
+#include <iomanip>
 using namespace std;
 
  
 //User Libraries Here
-
+const int SIZE = 10;
 
 
 //Function Prototypes Here
-void mkegrid(char[][10]);
-void dsplygd(char[][10]);
-void player(char[][10]);
+void mkegrid(char[][SIZE]);
+void dsplygd(char[][SIZE]);
+void player(char[][SIZE]);
 void victory();
 void loss();
 void aiShips();
 int disp();
-void plceshp(char[][10],char, int,int,int);
-int check(char[][10],int,int,int);
+void plceshp(char[][SIZE],char, int,int,int);
+int check(char[][SIZE],int,int,int);
 int Dcount(int);
 int Scount(int);
 int Bcount(int);
@@ -38,37 +39,38 @@ int aib(int);
 int aiC(int);
 int aic(int);
 int win(int);
-void fire(char[][10],char[][10],int,int);
-void ai(char[][10]);
-void play(char[][10],char[][10],char[][10]);
+void fire(char[][SIZE],char[][SIZE],int,int);
+void ai(char[][SIZE]);
+void play(char[][SIZE],char[][SIZE],char[][SIZE]);
 int hit(char&,char);
 int score(int);
 void fcnt();
+void intro();
 
 //Program Execution Begins Here
 int main(int argc, char** argv) {
- cout<<"BATTLESHIP"<<endl;;
-    
-    
-    
+    intro();
     char name = '_';
- char grid[10][10];
- 
-    char board[10][10];
-    char plays[10][10];
+ char grid[SIZE][SIZE];
+   
+   
+    char board[SIZE][SIZE];
+    char plays[SIZE][SIZE];
      // to check and stuff
     mkegrid(grid);
     mkegrid(plays);
     mkegrid(board);
-    
+    srand (time(NULL));
     //All the ships for the AI
     plceshp(grid,'C',5,4,2);
     plceshp(grid,'B',4,4,3);
     plceshp(grid,'S',3,7,1);
     plceshp(grid,'D',2,8,1);
     plceshp(grid,'c',3,7,1);
-    cout<<"First, we will show you the AI board for diagnostic purposes"<<endl;
-    dsplygd(grid);
+    
+    //Uncomment the following to see where the AI ships are located
+    //cout<<"First, we will show you the AI board for diagnostic purposes"<<endl;
+    //dsplygd(grid);
     
     play(grid,board,plays);
     
@@ -80,11 +82,11 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-void mkegrid(char grid[][10])
+void mkegrid(char grid[][SIZE])
 {
-     for(int row=0;row<=10;row++) //loop for rows
+     for(int row=0;row<=SIZE;row++) //loop for rows
     {
-        for(int col=0;col<=10;col++) //loop for columns
+        for(int col=0;col<=SIZE;col++) //loop for columns
         {
             
             grid[col][row]='_';
@@ -93,16 +95,16 @@ void mkegrid(char grid[][10])
     }
 }
 
-void dsplygd(char grid[][10])
+void dsplygd(char grid[][SIZE])
 {
     
     cout<<"  0 1 2 3 4 5 6 7 8 9 "<<endl;
     
-    for(int row=0;row<10;row++)
+    for(int row=0;row<SIZE;row++)
     {
        
         cout<<row<<" ";
-        for(int col=0;col<10;col++)
+        for(int col=0;col<SIZE;col++)
         {
             
             cout<<grid[col][row]<<" ";
@@ -113,31 +115,32 @@ void dsplygd(char grid[][10])
         cout<<endl;
     }
 }
-
-
-void plceshp(char grid[][10],char name, int size,int limitm,int limitL)
+// limitm is limit MAX and limitL is limitLESS(the low end of the limit. it makes no sense I know)
+void plceshp(char grid[][SIZE],char name, int size,int limitm,int limitL)
 {
-    srand (time(NULL));
+    
     int place1=0;
     int place2=0;
     int dis = disp(); // checks which axis the ship will take
     int place=1;
+    //Uncomment to see the random number that was generated for each ship
+    //cout<<"ITERATION;"<<dis<<endl;
     do
-    {
+    {           
              place1=(rand()%limitm)+limitL; // between the min and max limit of the ship
              place2=(rand()%limitm)+limitL;
             place=check(grid,place2,place1,dis);
     }while(place==1);
-    if(dis>=25) // checking the iteration
+    if(dis==1) // checking the iteration
     {
-    for(int i = 0; i <size;i++)
+    for(int i = 0; i <size;i++) // placing all the ships onto the vertical plane
     {
         
         grid[place1][place2+i]=name;//vertical
         
     }
     }
-    else
+    else if(dis==0)
     {
      for(int i = 0;i<size;i++)
      {
@@ -150,20 +153,21 @@ void plceshp(char grid[][10],char name, int size,int limitm,int limitL)
 
 int disp()
 {
+    
  int xory=0;
- xory=rand()%50;//random number between 0 and 50 to make the odds a little better
+ xory=rand()%2;//random number between 0 and 1 to find sorting of ships
  return xory;
 }
 
-int check(char grid[][10],int r, int c, int disp)
+int check(char grid[][SIZE],int r, int c, int disp)
 {
     char check;
-    if(disp>25) // vertical
+    if(disp==1) // vertical
     {
         // checks all the vertical sides
-        for(int i=c;i<10;i++)
+        for(int i=0;i<SIZE;i++)
         {
-            check=grid[c][r]; 
+            check=grid[c][i]; //Going through the rows to see if another ship is there
                     if(check!='_')
                         return 1;
         }
@@ -173,9 +177,10 @@ int check(char grid[][10],int r, int c, int disp)
     else
     {
         // checks all the horizontal sides
-        for(int i=r;i<10;i++)
+        for(int i=0;i<SIZE;i++)
         {
-            check=grid[c][r];
+            check=grid[i][r]; //Going through each column to see if another ship
+            //                                              is in the way
             if(check!='_')
                 return 1;
         }
@@ -183,11 +188,11 @@ int check(char grid[][10],int r, int c, int disp)
     }
     
 }
-int hit(char grid[][10],char name) // checking for a hit.
+int hit(char grid[][SIZE],char name) // checking for a hit.
 {
-   for(int col=0;col<10;col++)
+   for(int col=0;col<SIZE;col++)
    {
-       for(int row=0;row<10;row++)
+       for(int row=0;row<SIZE;row++)
        {
            int j = 0;
            if(grid[col][row]!=name)
@@ -281,7 +286,7 @@ int aiC(int Car=0)
 }
 //Firing at the enemy ship
 // one of the arrays is for diagnostics, to make sure everything ran fine
-void fire(char grid[][10],char board[][10],int col, int row)
+void fire(char grid[][SIZE],char board[][SIZE],int col, int row)
 {
     int first=0;
     int vict; // declare variables that will be sent to other functions
@@ -294,21 +299,22 @@ void fire(char grid[][10],char board[][10],int col, int row)
     }
     
    
-    switch(name)
+    switch(name)//Each AI ship is located with a letter that signifies their name
+            // this switch statement figures out which ship was hit
     {
    
         case 'D':
         
     {
-            grid[col][row]='H';
+            grid[col][row]='H'; // changes the diagnostic board and player board to H
             board[col][row]='H';
             // again, grid is for diagnostics
             
            
-            D=Dcount();
+            D=Dcount(); // add to Dcount
             cout<<D<<endl;
             
-            if(D==2)
+            if(D==2)//destroyer as only 2 spaces, if both hit the destroyer is sunk
             {
                 cout<<"Destroyer sunk!"<<endl;
                  if(vict>=17)// if you hit the enemy 17 times, you
@@ -323,7 +329,7 @@ void fire(char grid[][10],char board[][10],int col, int row)
     
     break;
         }
-        case 'c':
+        case 'c': // cruiser
         {
             grid[col][row]='H';
             board[col][row]='H';
@@ -332,7 +338,7 @@ void fire(char grid[][10],char board[][10],int col, int row)
                 cout<<"Cruiser sunk!!"<<endl;
                  if(vict>=17)
     {
-         
+         //if 17 positions are hit, all the ships are sunk, thus a victory
         victory();
     }
             }
@@ -340,7 +346,7 @@ void fire(char grid[][10],char board[][10],int col, int row)
                 cout<<"Cruise hit!"<<endl;
             break;
         }
-        case 'S':
+        case 'S'://submarine
         {
             grid[col][row]='H';
             board[col][row]='H';
@@ -358,7 +364,7 @@ void fire(char grid[][10],char board[][10],int col, int row)
                 cout<<"Submarine hit!"<<endl;
             break;
         }
-        case 'B':
+        case 'B'://battleship
         {
             grid[col][row]='H';
             board[col][row]='H';
@@ -369,7 +375,7 @@ void fire(char grid[][10],char board[][10],int col, int row)
               if(vict>=17)
     {
          
-      
+      //if 17 positions are hit, all the ships are sunk, thus a victory
         victory();
     }   
             }
@@ -388,7 +394,7 @@ void fire(char grid[][10],char board[][10],int col, int row)
                      if(vict>=17)
     {
          
-     
+     //if 17 positions are hit, all the ships are sunk, thus a victory
         victory();
     }
                 }
@@ -415,7 +421,7 @@ void fire(char grid[][10],char board[][10],int col, int row)
     }
 }
 // the function that plays the actual game. it calls other functions mainly
-void play(char grid[][10],char board[][10],char play[][10])
+void play(char grid[][SIZE],char board[][SIZE],char play[][SIZE])
 {
     int col,row;
     int Scre;
@@ -430,22 +436,23 @@ void play(char grid[][10],char board[][10],char play[][10])
       // This loop goes through the game until a victor is chosen.
         // the game value doesn't change on purpose
      
-     dsplygd(board); //Plain board0
+     dsplygd(board); //Plain board
      
         cout<<"Where would you like to fire! Enter the Column, then the row"<<endl;
     cin>>col;
     cin>>row;
-     fire(grid,board,col,row);
-     Scre=score(chk);//counting up the score
+     fire(grid,board,col,row);// call fire function to check the hit
+     Scre=score(chk);//counting up the score. each fire adds to the score.
      
-     dsplygd(play);
+     dsplygd(play);//display the grid
      cout<<"Now the AI shall take their shot!"<<endl;
      ai(play);
      
      
       
       
-    }while(game);
+    }while(game); // the loop is always true, so the game continues until
+    //                          a victor is chosen
 }
 
 void victory()
@@ -454,18 +461,17 @@ void victory()
     cout<<"You have vanquished your enemies! Congratulations!"<<endl;
     
     fcnt();
-    exit(EXIT_SUCCESS);
+    exit(EXIT_SUCCESS); // program exits
 }
 void loss()
 {
     //Generic loss message
     cout<<"You have lost! better luck next time!"<<endl;
-    exit(EXIT_SUCCESS);
+    exit(EXIT_SUCCESS); // program exits
 }
 
-void player(char player[][10])
+void player(char player[][SIZE])
 {
-    cout<<"Now you shall create your board!"<<endl;
     int choice,col,row;
     int counter=0;
     bool acct=false;
@@ -501,7 +507,7 @@ void player(char player[][10])
             cout<<"Please enter position "<<i+1<<" for your SUB. same as before!"<<endl;
             cin>>col;
             cin>>row;
-            while(col <0||col>=10 || row<0 || row>=10 || player[col][row]!='_')
+            while(col <0||col>=SIZE || row<0 || row>=SIZE || player[col][row]!='_')
             {
                 
                 cout<<"Incorrect placement! Try again."<<endl;
@@ -519,7 +525,7 @@ void player(char player[][10])
             cout<<"Please enter position "<<i+1<<" for your cruiser"<<endl;
             cin>>col;
             cin>>row;
-            while(col <0||col>=10 || row<0 || row>=10 || player[col][row]!='_')
+            while(col <0||col>=SIZE || row<0 || row>=SIZE || player[col][row]!='_')
             {
                 
                 cout<<"Incorrect placement! Try again."<<endl;
@@ -538,7 +544,7 @@ void player(char player[][10])
             cout<<"Please enter position "<<i+1<<" for your BATTLESHIP!"<<endl;
             cin>>col;
             cin>>row;
-            while(col <0||col>=10 || row<0 || row>=10 || player[col][row]!='_')
+            while(col <0||col>=SIZE || row<0 || row>=SIZE || player[col][row]!='_')
             {
                 
                 cout<<"Incorrect placement! Try again."<<endl;
@@ -555,7 +561,7 @@ void player(char player[][10])
             cout<<"Please enter position "<<i+1<<" for your CARRIER!"<<endl;
             cin>>col;
             cin>>row;
-            while(col <0||col>=10 || row<0 || row>=10 || player[col][row]!='_')
+            while(col <0||col>=SIZE || row<0 || row>=SIZE || player[col][row]!='_')
             {
                 
                 cout<<"Incorrect placement! Try again."<<endl;
@@ -573,10 +579,10 @@ void player(char player[][10])
    
 }
 
-void ai(char player[][10]) // this function is the AI attacking the players ships
+void ai(char player[][SIZE]) // this function is the AI attacking the players ships
 {
-    int col = rand()%10; // first declare the locations on the function
-    int row=rand()%10;
+    int col = rand()%SIZE; // first declare the locations on the function
+    int row=rand()%SIZE;
     int first=0;
     int vict;
     int D,c,S,B,C;
@@ -584,10 +590,11 @@ void ai(char player[][10]) // this function is the AI attacking the players ship
     
     do
     {
-        col=rand()%10;
-        row=rand()%10;
+        // the AI picks a random position to fire upon
+        col=rand()%SIZE;
+        row=rand()%SIZE;
         
-    }while(player[col][row]=='H'||player[col][row]=='M'||player[col][row]!='_');
+    }while(player[col][row]=='H'||player[col][row]=='M'||player[col][row]!='_'); // the AI picks a new location if they fired upon a specific position before
     //Obviously any player wouldn't hit the same place twice, so I threw in this logic that makes the computer not make that mistake, to make the game more challenging.
    if(name!='_'&&name!='H'&&name!='M')
     {
@@ -714,27 +721,31 @@ void ai(char player[][10]) // this function is the AI attacking the players ship
     }
 }
 
-int score(int C=0)
+int score(int C=0) // function counts up the players score
 {
     static int S=C;
     S++;
     return S;
 }
-void fcnt()
+void fcnt() // this prints out the players name and score!
 {
     int scre = score();
     int a; // pulled from txt
     cout<<endl;
     ofstream o;// prints onto file
     
+    int winner;
+    
     
    cout<<"Please enter your name, oh victorious one!"<<endl;
-    string name;
-    cin>>name;
-    cout<<name<<"'s SCORE: "<<scre<<endl;
-    o.open("Winners.txt",std::ofstream::out|std::ofstream::app);
+   string name;
+   cin>>name;
     
-    o<<name<<"'s SCORE: "<<scre<<endl;
+  
+   cout<<"NAME"<<setw(10)<<"SCORE"<<endl;
+   cout<<name<<setw(10)<<scre<<endl;
+    o<<"NAME"<<setw(10)<<"SCORE"<<endl;
+   o<<name<<setw(10)<<scre<<endl;
     o.close();
 }
 
@@ -744,3 +755,41 @@ void fcnt()
  * and have never been so challenged in my meagre life.
  
  */
+void intro()
+{
+        
+ 
+cout<<    "______  ___ _____ _____ _      _____ _____ _   _ ___________ "<<endl;
+cout<<    "| ___ \\/ _ \\_   _|_   _| |    |  ___/  ___| | | |_   _| ___ \\"<<endl;
+cout<<    "| |_/ / /_\\ \\| |   | | | |    | |__ \\ `--.| |_| | | | | |_/ /"<<endl;
+cout<<    "| ___ \\  _  || |   | | | |    |  __| `--. \\  _  | | | |  __/ "<<endl;
+cout<<    "| |_/ / | | || |   | | | |____| |___/\\__/ / | | |_| |_| |    "<<endl;
+cout<<    "\\____/\\_| |_/\\_/   \\_/ \\_____/\\____/\\____/\\_| |_/\\___/\\_|    "<<endl;
+ 
+ 
+ 
+cout<<endl;
+cout<<endl;
+cout<<endl;
+ 
+ 
+ 
+   cout<<"                                  You keeping us on course,"<<endl;
+    cout<<"                                   Little buddy?      "     <<endl;
+    cout<<"                                                           "<<endl;
+          cout<<"    Yes, Skipper \\                       __________________________"<<endl;
+ cout<<"                  H                      |   ____     _____"<<endl;
+ cout<<"    ___           O                      |  |____|   |_____|"<<endl;
+ cout<<"   |\\_ --------__,+-_____________________|____________________-------"<<endl;
+ cout<<"   \\  `===#==__|__/\\____|_____|_______|_______|_______|_____-------"<<endl;
+  cout<<"   \\                                                                   "<<endl;
+ cout<<"     |   ss. burton                                                    "<<endl;
+ cout<<"      \\                                                                "<<endl;
+ cout<<"   ~~~~-\\_ /~~=._         ~~~~~~~~~~~             ~~~~~~~~~~~~~         "<<endl;
+cout<<"~~~~      =/       ~~~~~~~~ ~~~~~~    ~~~~~~~~~~~~~             ~~~~~"<<endl;
+cout<<endl;
+cout<<endl;
+cout<<endl;
+cout<<endl;
+cout<<endl;
+}
